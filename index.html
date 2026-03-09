@@ -113,7 +113,7 @@
   <div class="by">HECHO POR LYNX LOCO CON GARRAS AZULES</div>
   <div class="discord">Únete al caos → <a href="https://discord.gg/spWx8vKT" target="_blank">discord.gg/spWx8vKT</a> 🐾</div>
   <p style="font-size:1rem; text-align:center; margin:15px 0;">
-    Solo cazo https://cdn.discordapp.com/attachments/... sin imágenes ni videos, solo archivos → uno por segundo (seguro, ~30 min para 1800) 🔥
+    Solo cazo https://cdn.discordapp.com/attachments/... sin imágenes, screenshots ni videos, solo archivos → uno por segundo (seguro, ~30 min para 1800) 🔥
   </p>
   <input type="file" id="fileInput" accept=".txt" multiple>
   <label for="webhook">Pega tu webhook de Discord (solo uno):</label>
@@ -144,9 +144,9 @@ function esCdnAttachment(url) {
     const u = url.toLowerCase();
     if (!u.startsWith('https://cdn.discordapp.com/attachments/')) return false;
     
-    // Extensiones de imágenes y videos a excluir
-    const imagenExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.tiff', '.heic'];
-    const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv', '.m4v'];
+    // Extensiones de imágenes, screenshots y videos a excluir
+    const imagenExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.tiff', '.heic', '.ico', '.jfif', '.avif', '.heif'];
+    const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv', '.m4v', '.mpeg', '.mpg', '.3gp', '.ogv'];
     const excludedExtensions = [...imagenExtensions, ...videoExtensions];
     
     // Verificar si termina con una extensión excluida
@@ -159,7 +159,7 @@ function esCdnAttachment(url) {
 }
 function descargarTXT() {
   if (linksFiltrados.length === 0) return;
-  let contenido = `Archivos de Discord encontrados (cdn.discordapp.com/attachments sin imágenes ni videos): ${linksFiltrados.length}\n\n`;
+  let contenido = `Archivos de Discord encontrados (cdn.discordapp.com/attachments sin imágenes, screenshots ni videos): ${linksFiltrados.length}\n\n`;
   linksFiltrados.forEach((url, i) => {
     contenido += `${i + 1}. ${url}\n`;
   });
@@ -192,14 +192,14 @@ async function procesarArchivos() {
   }
   linksFiltrados = Array.from(setUrls);
   if (linksFiltrados.length === 0) {
-    mostrarEstado('No se encontraron enlaces https://cdn.discordapp.com/attachments/ sin imágenes ni videos', 'warning');
+    mostrarEstado('No se encontraron enlaces https://cdn.discordapp.com/attachments/ sin imágenes, screenshots ni videos', 'warning');
     preview.textContent = '';
     return;
   }
   preview.textContent = linksFiltrados.map((url, i) =>
     `${i+1}. ${url}`
   ).join('\n');
-  mostrarEstado(`Listo: ${linksFiltrados.length} archivos de Discord encontrados (sin imágenes ni videos)`, 'success');
+  mostrarEstado(`Listo: ${linksFiltrados.length} archivos de Discord encontrados (sin imágenes, screenshots ni videos)`, 'success');
   descargarTXT();
 }
 async function enviarAlWebhook() {
