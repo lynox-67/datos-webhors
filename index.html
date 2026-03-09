@@ -28,7 +28,6 @@
       min-width: 100%;
       min-height: 100%;
       z-index: -2;
-      object-fit: cover;
     }
     #matrix-overlay {
       position: fixed;
@@ -113,17 +112,15 @@
   </style>
 </head>
 <body>
-<video autoplay muted loop playsinline id="bg-video">
-  <source src="https://www.youtube.com/embed/R8lHaEZYpCU?autoplay=1&mute=1&loop=1&playlist=R8lHaEZYpCU&controls=0&showinfo=0&rel=0&modestbranding=1" type="video/mp4">
-</video>
+<iframe id="bg-video" src="https://www.youtube.com/embed/R8lHaEZYpCU?autoplay=1&mute=1&loop=1&playlist=R8lHaEZYpCU&controls=0&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen"></iframe>
 <div id="matrix-overlay"></div>
 <div class="container">
   <h1>LYNOX HUB - MATRIX GREEN FILE SENDER 🧑‍💻</h1>
   <div class="by">HECHO POR LYNX EL HACKER LOCO</div>
   <p style="text-align:center; font-size:1.5rem; margin:30px 0;">
-    Ingresa links a archivos .txt → descarga y envía SOLO .txt (sin html/imágenes/videos) a varios webhooks (divididos, 1 por segundo)
+    Sube un archivo .txt con links a archivos .txt (uno por línea) → descarga y envía SOLO .txt (sin html/imágenes/videos) a varios webhooks (divididos, 1 por segundo)
   </p>
-  <textarea id="linksInput" rows="10" placeholder="Ingresa links a archivos .txt, uno por línea"></textarea>
+  <input type="file" id="linksFileInput" accept=".txt">
   <button id="processLinks">Cargar y Procesar Links</button>
   <label for="numWebhooks" style="font-size:1.5rem; margin-top:20px;">¿Cuántos webhooks usar? (1-5):</label>
   <select id="numWebhooks">
@@ -140,7 +137,7 @@
     <button id="restartSend">VOLVER A INICIAR 🔄</button>
     <button id="stopSend">ABORTAR 🛑</button>
   </div>
-  <div id="status">Esperando links... ingrésalos aquí 💀</div>
+  <div id="status">Esperando archivo con links... súbelo aquí 💀</div>
 </div>
 <div class="footer">
   LYN0X HUB - GREEN MATRIX 2026 🧑‍💻💚
@@ -167,9 +164,11 @@ let archivosFiltrados = [];
 let intervalos = [];
 let paused = false;
 let detenido = false;
+let links = [];
 const status = document.getElementById('status');
 const numWebhooksSelect = document.getElementById('numWebhooks');
 const webhookFields = document.getElementById('webhookFields');
+const linksFileInput = document.getElementById('linksFileInput');
 // Crear campos dinámicos para webhooks
 numWebhooksSelect.addEventListener('change', () => {
   webhookFields.innerHTML = '';
@@ -205,10 +204,18 @@ function esTxtValido(nombre) {
          !ext.endsWith('.avi') &&
          !ext.endsWith('.mkv');
 }
+linksFileInput.addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    links = e.target.result.split('\n').map(l => l.trim()).filter(l => l);
+    mostrarEstado(`Cargados ${links.length} links del archivo ${file.name}`, 'success');
+  };
+  reader.readAsText(file);
+});
 async function procesarLinks() {
-  const linksText = document.getElementById('linksInput').value.trim();
-  if (!linksText) return mostrarEstado('Ingresa links primero', 'error');
-  const links = linksText.split('\n').map(l => l.trim()).filter(l => l);
+  if (links.length === 0) return mostrarEstado('Primero sube un archivo con links y cárgalo', 'error');
   archivosFiltrados = [];
   for (let link of links) {
     try {
@@ -321,9 +328,10 @@ document.getElementById('restartSend').onclick = () => {
   intervalos = [];
   paused = false;
   detenido = false;
-  document.getElementById('linksInput').value = '';
-  document.getElementById('status').textContent = 'Listo para reiniciar → ingresa links de nuevo';
-  mostrarEstado('Reiniciado - ingresa links otra vez', 'success');
+  links = [];
+  linksFileInput.value = '';
+  document.getElementById('status').textContent = 'Listo para reiniciar → sube archivo con links de nuevo';
+  mostrarEstado('Reiniciado - sube archivo con links otra vez', 'success');
 };
 </script>
 </body>
